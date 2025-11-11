@@ -1,4 +1,4 @@
-# 👋 Hey, I’m Mukund — aka **mkshp**
+# 👋 Hey, I’m **mkshp**
 
 > Building open-source tools that make productivity, finance, and knowledge management simpler.
 
