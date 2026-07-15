@@ -1,6 +1,6 @@
 # 👋 Hey, I'm mkshp
 
-I build open-source tools around the software I use every day—making them a little more powerful, a little more enjoyable, and hopefully useful to others too.
+I build open source tools around the software I use every day, making them a little more powerful, a little more enjoyable, and hopefully useful to others too.
 
 ## 🚀 Featured Projects
 
