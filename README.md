@@ -15,22 +15,11 @@ Tools for building and navigating Maps of Content in Obsidian.
 
 ---
 
-## 🛠️ Tech Stack
-
-**Languages:** TypeScript · Python · JavaScript
-
-**Frameworks & Tools:** Svelte · Node.js · Flask · GitHub Actions · Docker · Linux
-
-**Ecosystem:** Obsidian API · Beancount · Fava
-
----
-
 ## 🌱 Currently Exploring
 
-- Designing extensible plugin architectures for Obsidian
-- Markdown-first workflows
-- Event-driven application design
-- Personal knowledge, finance, and media management
+- Knowledge management tools: Mostly settled on Obsidian. Playing around with the different workflow implementations
+- Personal Finance: Have been using beancount and fava + surrounding tools; working on getting it under obsidian roof
+- Self-hosting: Been using jellyfin, immich, nextcloud for long time. 
 
 ---
 
