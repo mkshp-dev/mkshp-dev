@@ -4,6 +4,8 @@ I build open source tools around the software I use every day, making them a lit
 
 **8,000+ downloads across 3 Obsidian plugins** · [mkshp.dev](https://mkshp.dev)
 
+[Bluesky @mkshp.dev](https://bsky.app/profile/mkshp.dev) · [X @mkshp_dev](https://x.com/mkshp_dev)
+
 ## 🚀 Featured Projects
 
 ### 📸 [Gallery View](https://github.com/mkshp-dev/obsidian-gallery-plugin)
