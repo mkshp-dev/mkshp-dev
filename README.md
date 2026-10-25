@@ -25,13 +25,11 @@ Tools for building and navigating Maps of Content in Obsidian.
 
 ### ⭐ Star History
 
-<a href="https://star-history.com/#mkshp-dev/obsidian-finance-plugin&mkshp-dev/obsidian-gallery-plugin&mkshp-dev/obsidian-MOC-plugin&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=mkshp-dev%2Fobsidian-finance-plugin%2Cmkshp-dev%2Fobsidian-gallery-plugin%2Cmkshp-dev%2Fobsidian-moc-plugin&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=mkshp-dev%2Fobsidian-finance-plugin%2Cmkshp-dev%2Fobsidian-gallery-plugin%2Cmkshp-dev%2Fobsidian-moc-plugin&type=Date" />
-    <img alt="Star history chart for mkshp's Obsidian plugins" src="https://api.star-history.com/svg?repos=mkshp-dev%2Fobsidian-finance-plugin%2Cmkshp-dev%2Fobsidian-gallery-plugin%2Cmkshp-dev%2Fobsidian-moc-plugin&type=Date" />
-  </picture>
-</a>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/star-history-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="assets/star-history-light.svg" />
+  <img alt="Total GitHub stars across featured projects over time" src="assets/star-history-light.svg" />
+</picture>
 
 ---
 
