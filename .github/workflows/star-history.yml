@@ -18,9 +18,6 @@ jobs:
           python-version: "3.12"
       - name: Render chart
         run: python scripts/star_history.py
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          STAR_HISTORY_TOKEN: ${{ secrets.STAR_HISTORY_TOKEN }}
       - name: Commit if changed
         run: |
           git add assets
