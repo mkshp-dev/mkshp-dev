@@ -2,10 +2,14 @@
 
 Fetches the starred_at timestamp of every stargazer on each repo in REPOS,
 merges them into one running total, and writes light and dark SVGs to assets/.
-Uses only the standard library; set GITHUB_TOKEN to avoid rate limits.
+Uses only the standard library. The stargazers API requires authentication, and
+the Actions GITHUB_TOKEN is rejected for other repos, so set STAR_HISTORY_TOKEN
+(a fine-grained token with read-only access to public repos). Tokens are tried
+in order: STAR_HISTORY_TOKEN, then GITHUB_TOKEN; a 401/403 moves to the next.
 """
 import json
 import os
+import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 
@@ -25,18 +29,32 @@ THEMES = {
 }
 
 
+def get_json(url, token):
+    req = urllib.request.Request(
+        url, headers={"Accept": "application/vnd.github.star+json", "User-Agent": "star-history"}
+    )
+    if token:
+        req.add_header("Authorization", f"Bearer {token}")
+    with urllib.request.urlopen(req) as resp:
+        return json.load(resp)
+
+
 def fetch_star_dates(repo):
-    token = os.environ.get("GITHUB_TOKEN")
+    tokens = [t for t in (os.environ.get("STAR_HISTORY_TOKEN"), os.environ.get("GITHUB_TOKEN")) if t]
     dates, page = [], 1
     while True:
-        req = urllib.request.Request(
-            f"https://api.github.com/repos/{repo}/stargazers?per_page=100&page={page}",
-            headers={"Accept": "application/vnd.github.star+json", "User-Agent": "star-history"},
-        )
-        if token:
-            req.add_header("Authorization", f"Bearer {token}")
-        with urllib.request.urlopen(req) as resp:
-            batch = json.load(resp)
+        url = f"https://api.github.com/repos/{repo}/stargazers?per_page=100&page={page}"
+        try:
+            batch = get_json(url, tokens[0] if tokens else None)
+        except urllib.error.HTTPError as e:
+            body = e.read().decode(errors="replace")
+            print(f"::warning::{repo}: HTTP {e.code} {body[:300]} "
+                  f"(rate limit remaining: {e.headers.get('X-RateLimit-Remaining')})")
+            if e.code in (401, 403) and len(tokens) > 1:
+                tokens.pop(0)  # retry the same page with the next token
+                continue
+            hint = " (set the STAR_HISTORY_TOKEN secret)" if e.code in (401, 403) else ""
+            raise SystemExit(f"Could not fetch stargazers for {repo}{hint}")
         if not batch:
             return dates
         dates += [datetime.fromisoformat(s["starred_at"].replace("Z", "+00:00")) for s in batch]
