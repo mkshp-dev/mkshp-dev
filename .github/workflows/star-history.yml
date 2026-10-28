@@ -20,6 +20,7 @@ jobs:
         run: python scripts/star_history.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STAR_HISTORY_TOKEN: ${{ secrets.STAR_HISTORY_TOKEN }}
       - name: Commit if changed
         run: |
           git add assets
