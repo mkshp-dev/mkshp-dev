@@ -1,15 +1,17 @@
 """Render a cumulative star-history chart for the featured projects.
 
-Fetches the starred_at timestamp of every stargazer on each repo in REPOS,
-merges them into one running total, and writes light and dark SVGs to assets/.
-Uses only the standard library. The stargazers API requires authentication, and
-the Actions GITHUB_TOKEN is rejected for other repos, so set STAR_HISTORY_TOKEN
-(a fine-grained token with read-only access to public repos). Tokens are tried
-in order: STAR_HISTORY_TOKEN, then GITHUB_TOKEN; a 401/403 moves to the next.
+GitHub only lists stargazers (with starred_at dates) to people with access to
+the repo, so the dates live in assets/star-history.json. Run with --seed and a
+GITHUB_TOKEN that can read the repos to rebuild that file from the API.
+
+The daily run needs no token: it reads each repo's public stargazers_count, adds
+new stars dated now or drops the newest ones after unstars so each repo's list
+matches the count, then merges them into one running total and writes light and
+dark SVGs to assets/. Uses only the standard library.
 """
 import json
 import os
-import urllib.error
+import sys
 import urllib.request
 from datetime import datetime, timezone
 
@@ -19,6 +21,7 @@ REPOS = [
     "mkshp-dev/obsidian-MOC-plugin",
 ]
 OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "assets")
+DATA = os.path.join(OUT_DIR, "star-history.json")
 
 W, H = 800, 320
 PAD_L, PAD_R, PAD_T, PAD_B = 48, 56, 48, 36
@@ -29,7 +32,7 @@ THEMES = {
 }
 
 
-def get_json(url, token):
+def get_json(url, token=None):
     req = urllib.request.Request(
         url, headers={"Accept": "application/vnd.github.star+json", "User-Agent": "star-history"}
     )
@@ -39,26 +42,22 @@ def get_json(url, token):
         return json.load(resp)
 
 
-def fetch_star_dates(repo):
-    tokens = [t for t in (os.environ.get("STAR_HISTORY_TOKEN"), os.environ.get("GITHUB_TOKEN")) if t]
+def fetch_star_dates(repo, token):
     dates, page = [], 1
     while True:
-        url = f"https://api.github.com/repos/{repo}/stargazers?per_page=100&page={page}"
-        try:
-            batch = get_json(url, tokens[0] if tokens else None)
-        except urllib.error.HTTPError as e:
-            body = e.read().decode(errors="replace")
-            print(f"::warning::{repo}: HTTP {e.code} {body[:300]} "
-                  f"(rate limit remaining: {e.headers.get('X-RateLimit-Remaining')})")
-            if e.code in (401, 403) and len(tokens) > 1:
-                tokens.pop(0)  # retry the same page with the next token
-                continue
-            hint = " (set the STAR_HISTORY_TOKEN secret)" if e.code in (401, 403) else ""
-            raise SystemExit(f"Could not fetch stargazers for {repo}{hint}")
+        batch = get_json(f"https://api.github.com/repos/{repo}/stargazers?per_page=100&page={page}", token)
         if not batch:
-            return dates
-        dates += [datetime.fromisoformat(s["starred_at"].replace("Z", "+00:00")) for s in batch]
+            return sorted(dates)
+        dates += [s["starred_at"] for s in batch]
         page += 1
+
+
+def sync(stars, repo):
+    """Grow or shrink a repo's sorted date list to match its public star count."""
+    count = get_json(f"https://api.github.com/repos/{repo}")["stargazers_count"]
+    dates = stars.get(repo, [])
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    stars[repo] = dates[:count] + [now] * (count - len(dates))
 
 
 def nice_step(max_value, ticks=4):
@@ -126,10 +125,21 @@ def render(dates, theme):
 
 
 def main():
-    dates = sorted(d for repo in REPOS for d in fetch_star_dates(repo))
+    if "--seed" in sys.argv:
+        token = os.environ.get("GITHUB_TOKEN")
+        stars = {repo: fetch_star_dates(repo, token) for repo in REPOS}
+    else:
+        with open(DATA) as f:
+            stars = json.load(f)
+        for repo in REPOS:
+            sync(stars, repo)
+    os.makedirs(OUT_DIR, exist_ok=True)
+    with open(DATA, "w") as f:
+        json.dump(stars, f, indent=1)
+        f.write("\n")
+    dates = sorted(datetime.fromisoformat(d.replace("Z", "+00:00")) for repo in REPOS for d in stars[repo])
     if not dates:
         raise SystemExit("No stars found")
-    os.makedirs(OUT_DIR, exist_ok=True)
     for theme in THEMES:
         with open(os.path.join(OUT_DIR, f"star-history-{theme}.svg"), "w") as f:
             f.write(render(dates, theme))
