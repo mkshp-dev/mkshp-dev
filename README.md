@@ -2,7 +2,7 @@
 
 I build open source tools around the software I use every day, making them a little more powerful, a little more enjoyable, and hopefully useful to others too.
 
-**8,000+ downloads across 3 Obsidian plugins** · [mkshp.dev](https://mkshp.dev)
+**<!-- downloads -->11,000+<!-- /downloads --> downloads across 3 Obsidian plugins** · [mkshp.dev](https://mkshp.dev)
 
 [Bluesky @mkshp.dev](https://bsky.app/profile/mkshp.dev) · [X @mkshp_dev](https://x.com/mkshp_dev)
 
@@ -28,7 +28,7 @@ Tools for building and navigating Maps of Content in Obsidian.
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/star-history-dark.svg" />
   <source media="(prefers-color-scheme: light)" srcset="assets/star-history-light.svg" />
-  <img alt="Total GitHub stars across featured projects over time" src="assets/star-history-light.svg" />
+  <img alt="GitHub stars over time, stacked by plugin" src="assets/star-history-light.svg" />
 </picture>
 
 ---
